@@ -1,18 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
+﻿using DotNetEnv;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 class Program
 {
     static async Task Main()
-    {
-        string apiKey = "***"; // Groq API anahtarın
-        //string model = "meta-llama/llama-4-scout-17b-16e-instruct";
+    {// Proje kökünden .env dosyasını bul ve yükle
+        string projectRoot = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "..", "..", ".."));
+        string envFilePath = Path.Combine(projectRoot, ".env");
+
+        if (!File.Exists(envFilePath))
+        {
+            Console.WriteLine($".env dosyası bulunamadı: {envFilePath}");
+            return;
+        }
+
+        Env.Load(envFilePath);
+
+        // Ortam değişkeninden API key al
+        string apiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
         string model = "openai/gpt-oss-120b";
+
+        if (string.IsNullOrEmpty(apiKey))
+        {
+            Console.WriteLine("API key bulunamadı! .env dosyasına GROQ_API_KEY ekleyin.");
+            return;
+        }
 
 
         var messages = new List<object>(); // Sohbet geçmişi
